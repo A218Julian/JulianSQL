@@ -1,0 +1,102 @@
+DraftData <- read.csv("NFLdraftHistory.csv")
+getwd(NFLdraftHistory.csv)
+if (file.exists("NFLdraftHistory.csv")) {
+  DraftData <- read.csv("NFLdraftHistory.csv")
+} else {
+  cat("File not found!")
+}
+library(readr)
+NFLDraftHistory <- read_csv("NFLDraftHistory.csv")
+View(NFLDraftHistory)
+
+NFL23BIGData <- read_csv("spreadspoke_scores.csv")
+
+##Boxplot: 
+
+ggplot(NFL23BIGData, aes(x = weather_temperature, y = score_home + score_away)) +
+  geom_boxplot() +
+  labs(y = "Temp", x = "score_home + score_away") +
+  theme_minimal()
+
+ggplot(NFLDraftHistory, aes(x = hof, y = pick)) +
+  geom_boxplot() +
+  labs(y = "Pick", x = "Hall of Fame (HOF)") +
+  theme_minimal()
+
+#Combine ScoreS:
+
+NFL23BIGData$combined_score <- NFL23BIGData$score_home + NFL23BIGData$score_away
+
+
+#Scatterplot:
+
+ggplot(NFL23BIGData, aes(x=`score_home + score_away`, y= `weather_temperature`)) + 
+  labs(title="Does Temp Affect Score", x="score_home + score_away", y="weather_temperature") + 
+  theme_minimal()
+
+#-------
+
+ggplot(NFL23BIGData, aes(x = combined_score, y = weather_temperature)) + 
+  labs(title = "Does Temp Affect Score", x = "Combined Score", y = "Weather Temperature") + 
+  theme_minimal() +
+  geom_point()  # add this to actually visualize the points on the scatter plot
+#--------------------
+#Add The Linear Regression Line: 
+
+ggplot(NFL23BIGData, aes(x = combined_score, y = weather_temperature)) + 
+  labs(title = "Does Temp Affect Score", x = "Combined Score", y = "Weather Temperature") + 
+  theme_minimal() +
+  geom_point() +
+  geom_smooth(method = "lm", se = TRUE, color = "blue")
+
+#Add colors for schedule_season :
+
+ggplot(NFL23BIGData, aes(x = combined_score, y = weather_temperature)) + 
+  geom_point(aes(color = as.factor(schedule_season))) +  # map the color aesthetic to schedule_season
+  geom_smooth(method = "lm", se = TRUE, aes(group = 1)) +  # regression line for all data together
+  labs(title = "Does Temp Affect Score", 
+       x = "Combined Score", 
+       y = "Weather Temperature", 
+       color = "Schedule Season") +  # legend title for color
+  theme_minimal()
+
+
+
+##Identify Outlier: 
+library(ggplot2)
+
+p <- ggplot(NFLDraftHistory, aes(x = hof, y = pick)) +
+  geom_boxplot() +
+  labs(y = "Pick", x = "Hall of Fame (HOF)") +
+  theme_minimal()
+
+print(p)
+
+false_hof_outliers <- boxplot.stats(NFLDraftHistory$pick[NFLDraftHistory$hof == FALSE])$out
+true_hof_outliers <- boxplot.stats(NFLDraftHistory$pick[NFLDraftHistory$hof == TRUE])$out
+
+#Annotate on Plot:
+p + 
+  geom_text(data = subset(NFLDraftHistory, pick %in% false_hof_outliers & hof == FALSE), 
+            aes(label = pfr_player_name), vjust = -1, hjust = 1.5) +
+  geom_text(data = subset(NFLDraftHistory, pick %in% true_hof_outliers & hof == TRUE), 
+            aes(label = pfr_player_name), vjust = -1, hjust = -0.5)
+
+#IQR:
+Q1 <- quantile(NFLDraftHistory$pick, 0.25)
+Q3 <- quantile(NFLDraftHistory$pick, 0.75)
+IQR <- Q3 - Q1
+
+#Determine Outlier: 
+outliers_below <- Q1 - 1.5 * IQR
+outliers_above <- Q3 + 1.5 * IQR
+
+#Filter Player names: 
+outliers_data <- NFLDraftHistory[NFLDraftHistory$pick < outliers_below | NFLDraftHistory$pick > outliers_above, ]
+outliers_names <- outliers_data$pfr_player_name
+print(outliers_names)
+
+#Check Range: 
+range(NFLDraftHistory$pick)
+
+
