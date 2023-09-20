@@ -1,0 +1,88 @@
+names(NFL_QB_Stats)
+ [1] "Year"     "Player"   "Pass.Yds" "Yds.Att"  "Att"      "Cmp"      "Cmp.."    "TD"       "INT"     
+[10] "Rate"     "X1st"     "X1st."    "X20."     "X40."     "Lng"      "Sck"      "SckY"    
+> ggplot(subset_data, aes(x=`Pass.Yds`, y=Rate)) + 
++   geom_point(aes(color=Year)) + 
++   labs(title="Scatter plot of Pass.Yds vs Rate", x="Pass.Yards", y="Rate") + 
++   theme_minimal()
+Error in ggplot(subset_data, aes(x = Pass.Yds, y = Rate)) : 
+  could not find function "ggplot"
+> install.packages("ggplot2")
+Installing package into ‘/cloud/lib/x86_64-pc-linux-gnu-library/4.3’
+(as ‘lib’ is unspecified)
+trying URL 'http://rspm/default/__linux__/focal/latest/src/contrib/ggplot2_3.4.3.tar.gz'
+Content type 'application/x-gzip' length 3320442 bytes (3.2 MB)
+==================================================
+downloaded 3.2 MB
+
+* installing *binary* package ‘ggplot2’ ...
+* DONE (ggplot2)
+
+The downloaded source packages are in
+	‘/tmp/RtmpJz6QVJ/downloaded_packages’
+> library(ggplot2)
+Use suppressPackageStartupMessages() to eliminate package startup messages
+> ggplot(subset_data, aes(x=`Pass.Yds`, y=Rate)) + 
++   geom_point(aes(color=Year)) + 
++   labs(title="Scatter plot of Pass.Yds vs Rate", x="Pass.Yards", y="Rate") + 
++   theme_minimal()
+> ggplot(subset_data, aes(x=`Pass.Yds`, y= `Yds.Att`)) + 
++   geom_point(aes(color=Year)) + 
++   labs(title="Scatter plot of Pass.Yds vs Yds.Att", x="Pass.Yards", y="Yds.Att") + 
++   theme_minimal()
+> iqr_pass_yds <- IQR(subset_data$`Pass.Yds`)
+> lower_bound_pass_yds <- quantile(subset_data$`Pass.Yds`, 0.25) - 1.5 * iqr_pass_yds
+> upper_bound_pass_yds <- quantile(subset_data$`Pass.Yds`, 0.75) + 1.5 * iqr_pass_yds
+> iqr_yds_att <- IQR(subset_data$`Yds.Att`)
+> lower_bound_yds_att <- quantile(subset_data$`Yds.Att`, 0.25) - 1.5 * iqr_yds_att
+> upper_bound_yds_att <- quantile(subset_data$`Yds.Att`, 0.75) + 1.5 * iqr_yds_att
+> subset_data$outliers <- (subset_data$`Pass.Yds` < lower_bound_pass_yds | subset_data$`Pass.Yds` > upper_bound_pass_yds) |
++   (subset_data$`Yds.Att` < lower_bound_yds_att | subset_data$`Yds.Att` > upper_bound_yds_att)
+> subset_data$outliers <- (subset_data$`Pass.Yds` < lower_bound_pass_yds | subset_data$`Pass.Yds` > upper_bound_pass_yds) |
++   (subset_data$`Yds.Att` < lower_bound_yds_att | subset_data$`Yds.Att` > upper_bound_yds_att)
+> subset_data$outliers <- (subset_data$`Pass.Yds` < lower_bound_pass_yds | subset_data$`Pass.Yds` > upper_bound_pass_yds) |
++   (subset_data$`Yds.Att` < lower_bound_yds_att | subset_data$`Yds.Att` > upper_bound_yds_att)
+> ggplot(subset_data, aes(x=`Pass.Yds`, y= `Yds.Att`, color=as.factor(outliers))) + 
++   geom_point() + 
++   labs(title="Scatter plot of Pass.Yds vs Yds.Att", x="Pass.Yards", y="Yds.Att", color="Outliers") + 
++   scale_color_manual(values = c("red", "blue"), labels = c("Outlier", "Not Outlier")) +
++   theme_minimal()
+> lower_bound_pass_yds
+  25% 
+-3038 
+> upper_bound_pass_yds
+ 75% 
+6298 
+> lower_bound_yds_att <- quantile(subset_data$`Yds.Att`, 0.25) - 1.5 * iqr_yds_att
+> lower_bound_yds_att
+25% 
+3.9 
+> upper_bound_yds_att
+75% 
+9.5 
+> outlier_players <- subset_data$Player[subset_data$outliers]
+> print(outlier_players)
+ [1] "Taysom Hill"      "Jacob Eason"      "Brian Hoyer"      "Jake Fromm"       "Ryan Tannehill"  
+ [6] "Ryan Fitzpatrick" "Nathan Peterman"  "Matt McGloin"     "Colt McCoy"       "Ryan Nassib"     
+[11] "Tarvaris Jackson" "Matt Hasselbeck"  "Curtis Painter"   "Kirk Cousins"     "Shaun Hill"      
+[16] "Matt Leinart"     "Matt Flynn"       "Tarvaris Jackson" "Mark Brunell"     "David Carr"      
+[21] "Jim Sorgi"        "Patrick Ramsey"   "Jon Kitna"        "Jeff Blake"       "Gus Frerotte"    
+[26] "Kurt Kittner"     "Dave Ragone"      "Akili Smith"      "Jake Delhomme"    "Tommy Maddox"    
+[31] "A.J. Feeley"      "Kurt Warner"      "Spergon Wynn"     "Jeff Lewis"       "Tom Tupa"        
+[36] "Chris Chandler"   "Rob Johnson"      "John Friesz"      "Danny Kanell"     "Kordell Stewart" 
+[41] "Jason Garrett"    "Mark Brunell"     "Pat Ryan"         "Steve Young"      "Jeff Kemp"       
+[46] "Ken Karcher"      "Steve Bono"       "Ed Rubbert"       "Jeff Kemp"        "Mike Kelley"     
+[51] "Kevin Sweeney"    "Dave Wilson"      "Reggie Collier"   "Steve Grogan"     "Don Strock"      
+[56] "Walter Payton"    "Pat Ryan"         "Greg Landry"      "David Archer"     "Phil Simms"      
+[61] "Marcus Allen"     "Walter Payton"    "Guido Merkens"    "Andy Johnson"     "Mike Phipps"     
+[66] "Joe Pisarcik"     "Bob Lee"          "Randy Dean"       "Jerry Golsteyn"   "Randy Hedberg"   
+[71] "Joe Reed"         "Marty Domres"     "Kim McQuilken"    "Danny White"      "John Jones"      
+[76] "Bobby Douglass"   "Marty Domres"     "Will Cureton"     "Earl Morrall"     "Clint Longley"   
+[81] "Joe Theismann"    "Greg Pruitt"      "Terry Hanratty"   "Sonny Jurgensen"  "Randy Johnson"   
+[86] "Jim Del Gaizo"    "O.J. Simpson"     "Ron Widby"        "Mike Phipps"     
+> ggplot(subset_data, aes(x=`Pass.Yds`, y= `Yds.Att`, color=as.factor(outliers))) + 
++   geom_point() + 
++   geom_text(data=subset(subset_data, outliers), aes(label=Player), vjust=-1, hjust=1, size=3, check_overlap = TRUE) +
++   labs(title="Scatter plot of Pass.Yds vs Yds.Att", x="Pass.Yards", y="Yds.Att", color="Outliers") + 
++   scale_color_manual(values = c("red", "blue"), labels = c("Outlier", "Not Outlier")) +
++   theme_minimal()
