@@ -1,0 +1,60 @@
+# # Setting Dataset up for graph:
+install.packages("ggplot2")
+library(ggplot2)
+names(NFL_QB_Stats)
+ggplot(subset_data, aes(x=`Att`, y= `Cmp..`)) + 
+  geom_point(aes(color=Year)) + 
+  labs(title="Scatter plot of Att vs Cmp %", x="Att", y="Cmp..") + 
+  theme_minimal()
+
+IQR_TD <- IQR(subset_data$`Att`, na.rm = TRUE)
+IQR_INT <- IQR(subset_data$`Cmp..`, na.rm = TRUE)
+
+colnames(subset_data)
+# # Adding green Regression line up for graph:
+
+ggplot(subset_data, aes(x=Att, y=Cmp..)) + 
+  geom_point(aes(color=Year)) + 
+  geom_smooth(method="lm", se=FALSE, color="#00FF00") +  # Adds regression line
+  labs(title="Scatter plot of Att vs Cmp %", x="Att", y="Cmp..") + 
+  theme_minimal()
+
+# # Adding color pallate:
+
+install.packages("RColorBrewer")
+library(RColorBrewer)
+
+color_palette <- brewer.pal(11, "Spectral")  # This gives you 11 distinct colors
+colors <- colorRampPalette(color_palette)(50)  # This expands the palette to 50 colors
+
+#Change the color of the dots:
+
+library(ggplot2)
+
+ggplot(subset_data, aes(x=Att, y=Cmp..)) + 
+  geom_point(aes(color=factor(Year))) + 
+  geom_smooth(method="lm", se=FALSE, color="black") + 
+  labs(title="Scatter plot of Att vs Cmp %", x="Att", y="Cmp..") + 
+  scale_color_manual(values=colors) +
+  theme_minimal()
+
+# Because of! Insufficient values in manual scale. 53 needed but only 50 provided error :
+
+unique_years <- length(unique(subset_data$Year))
+
+#Fix the color palate to 53:
+
+library(RColorBrewer)
+
+color_palette <- brewer.pal(min(11, unique_years), "Spectral")
+colors <- colorRampPalette(color_palette)(unique_years)
+
+#Change the colors on the scale to each year having individual colors:
+library(ggplot2)
+
+ggplot(subset_data, aes(x=Att, y=Cmp..)) + 
+  geom_point(aes(color=factor(Year))) + 
+  geom_smooth(method="lm", se=FALSE, color="black") + 
+  labs(title="Scatter plot of Att vs Cmp %", x="Att", y="Cmp..") + 
+  scale_color_manual(values=colors) +
+  theme_minimal()
