@@ -1,5 +1,5 @@
 Declare @MetricMonth varchar(45) = '202308'
-Declare @Director varchar(45) = 'Jeff Miles'
+Declare @Director varchar(45) = ''
 
 ;With ContactName as 
 (	 Select Distinct
